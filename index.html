@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Versus Studio Workflow</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #f5f4f0; color: #111827; min-height: 100vh; }
+
+  .page { max-width: 900px; margin: 0 auto; padding: 24px 20px 60px; }
+
+  .track-wrap { width: 100%; max-width: 680px; margin: 0 auto 0; }
+  .track-wrap svg { width: 100%; height: auto; display: block; }
+
+  .tap { cursor: pointer; transition: opacity 0.25s; }
+  .tap:hover { opacity: 0.84; }
+
+  /* PANEL */
+  .panel { display: none; margin-top: 16px; border-radius: 12px; overflow: hidden; border: 1px solid #e5e7eb; background: #fff; }
+  .panel.active { display: block; }
+
+  .panel-header { padding: 16px 20px 12px; border-bottom: 1px solid #e5e7eb; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; background: #fff; }
+  .panel-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 3px; }
+  .panel-title { font-size: 18px; font-weight: 600; color: #111827; margin-bottom: 3px; }
+  .panel-sub { font-size: 12px; color: #6b7280; line-height: 1.5; }
+
+  .close-btn { font-size: 11px; color: #6b7280; cursor: pointer; border: 1px solid #d1d5db; background: #f9fafb; border-radius: 6px; padding: 5px 12px; white-space: nowrap; flex-shrink: 0; line-height: 1.4; }
+  .close-btn:hover { color: #111827; background: #f3f4f6; }
+
+  .panel-body { display: grid; grid-template-columns: 1fr 1fr; }
+  @media (max-width: 600px) { .panel-body { grid-template-columns: 1fr; } }
+
+  .panel-col { padding: 16px 20px; background: #fff; }
+  .panel-col + .panel-col { border-left: 1px solid #e5e7eb; }
+  @media (max-width: 600px) { .panel-col + .panel-col { border-left: none; border-top: 1px solid #e5e7eb; } }
+
+  .col-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: #6b7280; margin-bottom: 10px; padding-bottom: 7px; border-bottom: 1px solid #e5e7eb; }
+
+  .narrative { font-size: 13px; color: #1f2937; line-height: 1.75; margin-bottom: 12px; }
+  .narrative:last-child { margin-bottom: 0; }
+
+  .role-block { margin-bottom: 12px; }
+  .role-block:last-child { margin-bottom: 0; }
+  .role-name { font-size: 12px; font-weight: 600; color: #111827; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+
+  .tag { font-size: 10px; font-weight: 500; padding: 2px 7px; border-radius: 10px; }
+  .tag-core { background: #d1fae5; color: #065f46; }
+  .tag-minimal { background: #fef3c7; color: #92400e; }
+  .tag-sit { background: #dbeafe; color: #1e40af; }
+  .tag-neutral { background: #f3f4f6; color: #4b5563; border: 1px solid #e5e7eb; }
+
+  .role-bullets { list-style: none; padding: 0; }
+  .role-bullets li { font-size: 12px; color: #4b5563; line-height: 1.65; padding: 2px 0 2px 14px; position: relative; }
+  .role-bullets li::before { content: "–"; position: absolute; left: 0; color: #9ca3af; }
+
+  .panel-note { padding: 11px 20px; border-top: 1px solid #e5e7eb; font-size: 11px; color: #6b7280; line-height: 1.65; font-style: italic; background: #f9fafb; }
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="track-wrap" style="position:relative;">
+<canvas id="ringCanvas" style="width:100%;height:auto;display:block;"></canvas>
+<svg id="trackSvg" viewBox="0 0 680 560" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+  <defs>
+    <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+    </marker>
+  </defs>
+
+  <!-- Invisible hit areas for each leg (on top of canvas ring) -->
+  <g id="leg1-arc" class="tap" onclick="showDetail('leg1')">
+    <path d="M 340 58 A 237 237 0 0 0 55 295" fill="none" stroke="transparent" stroke-width="100"/>
+  </g>
+  <g id="leg2-arc" class="tap" onclick="showDetail('leg2')">
+    <path d="M 55 295 A 237 237 0 0 0 340 532" fill="none" stroke="transparent" stroke-width="100"/>
+  </g>
+  <g id="leg3-arc" class="tap" onclick="showDetail('leg3')">
+    <path d="M 340 532 A 237 237 0 0 0 625 295" fill="none" stroke="transparent" stroke-width="100"/>
+  </g>
+  <g id="leg4-arc" class="tap" onclick="showDetail('leg4')">
+    <path d="M 625 295 A 237 237 0 0 0 340 58" fill="none" stroke="transparent" stroke-width="100"/>
+  </g>
+
+  <!-- Center fill -->
+  <ellipse id="center-reset" cx="340" cy="295" rx="139" ry="119" fill="#f0eeea" onclick="resetAll()" style="cursor:pointer"/>
+  <ellipse cx="340" cy="295" rx="139" ry="119" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="1.5"/>
+
+  <!-- Checkerboard start/finish -->
+  <rect x="295" y="50" width="100" height="15" rx="2" fill="white" opacity="0.95"/>
+  <rect x="295" y="50" width="12" height="7" fill="#222" opacity="0.7"/><rect x="319" y="50" width="12" height="7" fill="#222" opacity="0.7"/>
+  <rect x="343" y="50" width="12" height="7" fill="#222" opacity="0.7"/><rect x="367" y="50" width="12" height="7" fill="#222" opacity="0.7"/>
+  <rect x="307" y="57" width="12" height="8" fill="#222" opacity="0.7"/><rect x="331" y="57" width="12" height="8" fill="#222" opacity="0.7"/>
+  <rect x="355" y="57" width="12" height="8" fill="#222" opacity="0.7"/><rect x="379" y="57" width="12" height="8" fill="#222" opacity="0.7"/>
+
+  <!-- Direction arrows -->
+  <path d="M 222 74 Q 160 94 122 148" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" marker-end="url(#arr)"/>
+  <path d="M 72 372 Q 82 440 148 480" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" marker-end="url(#arr)"/>
+  <path d="M 450 510 Q 530 476 568 412" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" marker-end="url(#arr)"/>
+  <path d="M 590 196 Q 556 120 476 82" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" marker-end="url(#arr)"/>
+
+  <!-- Pass circles -->
+  <circle cx="88" cy="172" r="17" fill="white" stroke="#F0997B" stroke-width="2"/>
+  <text x="88" y="177" text-anchor="middle" font-size="9" font-weight="600" fill="#993C1D" font-family="-apple-system,sans-serif">PASS</text>
+  <circle cx="88" cy="418" r="17" fill="white" stroke="#378ADD" stroke-width="2"/>
+  <text x="88" y="423" text-anchor="middle" font-size="9" font-weight="600" fill="#185FA5" font-family="-apple-system,sans-serif">PASS</text>
+  <circle cx="592" cy="418" r="17" fill="white" stroke="#639922" stroke-width="2"/>
+  <text x="592" y="423" text-anchor="middle" font-size="9" font-weight="600" fill="#3B6D11" font-family="-apple-system,sans-serif">PASS</text>
+
+  <!-- Leg labels -->
+  <g transform="translate(138 152) rotate(-44)"><text text-anchor="middle" font-size="9" font-weight="600" fill="#712B13" letter-spacing="1.5" font-family="-apple-system,sans-serif">LEG 1</text></g>
+  <g transform="translate(128 400) rotate(44)"><text text-anchor="middle" font-size="9" font-weight="600" fill="#0C447C" letter-spacing="1.5" font-family="-apple-system,sans-serif">LEG 2</text></g>
+  <g transform="translate(484 468) rotate(0)"><text text-anchor="middle" font-size="9" font-weight="600" fill="#27500A" letter-spacing="1.5" font-family="-apple-system,sans-serif">LEG 3</text></g>
+  <g transform="translate(542 162) rotate(44)"><text text-anchor="middle" font-size="9" font-weight="600" fill="#3C3489" letter-spacing="1.5" font-family="-apple-system,sans-serif">LEG 4</text></g>
+
+  <!-- Center text — click resets -->
+  <text x="340" y="266" text-anchor="middle" font-size="20" font-weight="700" fill="#111827" font-family="-apple-system,sans-serif" letter-spacing="2" onclick="resetAll()" style="cursor:pointer">VERSUS</text>
+  <text x="340" y="281" text-anchor="middle" font-size="8" fill="#9ca3af" letter-spacing="3" font-family="-apple-system,sans-serif" onclick="resetAll()" style="cursor:pointer">STUDIO WORKFLOW</text>
+  <g onclick="resetAll()" style="cursor:pointer">
+    <line x1="295" y1="292" x2="385" y2="292" stroke="#e5e7eb" stroke-width="0.5"/>
+    <text x="340" y="306" text-anchor="middle" font-size="9" font-weight="600" fill="#374151" font-family="-apple-system,sans-serif">President</text>
+    <text x="340" y="322" text-anchor="middle" font-size="9" font-weight="600" fill="#374151" font-family="-apple-system,sans-serif">CEO</text>
+    <text x="340" y="338" text-anchor="middle" font-size="9" font-weight="600" fill="#374151" font-family="-apple-system,sans-serif">MD / DOCO</text>
+    <text x="340" y="354" text-anchor="middle" font-size="9" font-weight="600" fill="#374151" font-family="-apple-system,sans-serif">Dir. Finance &amp; Ops</text>
+  </g>
+
+  <!-- Leg cards -->
+  <g class="tap" onclick="showDetail('leg1')">
+    <rect x="4" y="8" width="196" height="52" rx="9" fill="#FAECE7" stroke="#F0997B" stroke-width="1.5"/>
+    <text x="102" y="24" text-anchor="middle" font-size="8" font-weight="600" fill="#993C1D" letter-spacing="1.4" font-family="-apple-system,sans-serif">START / FINISH</text>
+    <text x="102" y="39" text-anchor="middle" font-size="12" font-weight="600" fill="#712B13" font-family="-apple-system,sans-serif">Business Development</text>
+    <text x="102" y="52" text-anchor="middle" font-size="9" fill="#993C1D" font-family="-apple-system,sans-serif">Outreach · Lead Gen · Capabilities · P/R</text>
+  </g>
+  <g class="tap" onclick="showDetail('leg2')">
+    <rect x="4" y="494" width="196" height="58" rx="9" fill="#E6F1FB" stroke="#85B7EB" stroke-width="1.5"/>
+    <text x="102" y="510" text-anchor="middle" font-size="8" font-weight="600" fill="#185FA5" letter-spacing="1.4" font-family="-apple-system,sans-serif">BATON PASS #1</text>
+    <text x="102" y="525" text-anchor="middle" font-size="12" font-weight="600" fill="#0C447C" font-family="-apple-system,sans-serif">Project Intake / Scoping</text>
+    <text x="102" y="538" text-anchor="middle" font-size="9" fill="#185FA5" font-family="-apple-system,sans-serif">Briefs · Bidding · Pitching</text>
+    <text x="102" y="550" text-anchor="middle" font-size="9" fill="#185FA5" font-family="-apple-system,sans-serif">Job Planning · Resourcing</text>
+  </g>
+  <g class="tap" onclick="showDetail('leg3')">
+    <rect x="480" y="494" width="196" height="58" rx="9" fill="#EAF3DE" stroke="#97C459" stroke-width="1.5"/>
+    <text x="578" y="510" text-anchor="middle" font-size="8" font-weight="600" fill="#3B6D11" letter-spacing="1.4" font-family="-apple-system,sans-serif">BATON PASS #2</text>
+    <text x="578" y="525" text-anchor="middle" font-size="12" font-weight="600" fill="#27500A" font-family="-apple-system,sans-serif">Production</text>
+    <text x="578" y="538" text-anchor="middle" font-size="9" fill="#3B6D11" font-family="-apple-system,sans-serif">Live &amp; Post · Pre through Delivery</text>
+    <text x="578" y="550" text-anchor="middle" font-size="9" fill="#3B6D11" font-family="-apple-system,sans-serif">Artists · Motion · VFX · Editors</text>
+  </g>
+  <g class="tap" onclick="showDetail('leg4')">
+    <rect x="480" y="8" width="196" height="52" rx="9" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="1.5"/>
+    <text x="578" y="24" text-anchor="middle" font-size="8" font-weight="600" fill="#534AB7" letter-spacing="1.4" font-family="-apple-system,sans-serif">BATON PASS #3</text>
+    <text x="578" y="39" text-anchor="middle" font-size="12" font-weight="600" fill="#26215C" font-family="-apple-system,sans-serif">Marketing &amp; PR</text>
+    <text x="578" y="52" text-anchor="middle" font-size="9" fill="#534AB7" font-family="-apple-system,sans-serif">Case Studies · Website · PR Moments</text>
+  </g>
+</svg>
+</div>
+
+<!-- LEG 1 -->
+<div id="panel-leg1" class="panel">
+  <div class="panel-header">
+    <div>
+      <div class="panel-eyebrow" style="color:#993C1D">Leg 1 · Start / Finish</div>
+      <div class="panel-title">Business Development</div>
+      <div class="panel-sub">Outreach · Lead generation · Capabilities presentations · P/R &amp; marketing</div>
+    </div>
+    <span class="close-btn" onclick="closeDetail('leg1')">Close ✕</span>
+  </div>
+  <div class="panel-body">
+    <div class="panel-col">
+      <div class="col-label">How this leg works</div>
+      <p class="narrative">The race starts here. BD owns the relationship before there's a project to run: hunting opportunities, building trust, and converting conversations into awarded work. This is the prospecting leg: outreach, capabilities presentations, lead tracking, and the groundwork that makes the pitch possible.</p>
+      <p class="narrative">When a project is won, BD hands the baton and the leg is complete. But the finish line is also the start line. Every case study, every portfolio win, every piece of PR that comes out of Leg 4 feeds directly back into BD's ability to open the next door. The loop is intentional.</p>
+      <div class="col-label" style="margin-top:16px">The BD team's role</div>
+      <ul class="role-bullets">
+        <li>Identifies and develops new opportunities across Agency, Brand / ENT, and IP Originals</li>
+        <li>Manages outreach, relationship building, and pipeline tracking</li>
+        <li>Leads capabilities presentations and pitches in partnership with EPs and ECD</li>
+        <li>Owns the client relationship until award — then formally hands off to the Production EP</li>
+        <li>Leverages delivered work and marketing materials to generate future pipeline</li>
+      </ul>
+    </div>
+    <div class="panel-col">
+      <div class="col-label">Team on this leg</div>
+      <div class="role-block">
+        <div class="role-name">BD Team &amp; PR / Marketing <span class="tag tag-core">Core</span></div>
+        <ul class="role-bullets"><li>Drives all outreach, lead generation, and pipeline development</li></ul>
+      </div>
+      <div class="role-block">
+        <div class="role-name">BD EPs <span class="tag tag-core">Core</span></div>
+        <ul class="role-bullets"><li>Lead the bid and client relationship through to award</li></ul>
+      </div>
+      <div class="role-block">
+        <div class="role-name">ECD <span class="tag tag-sit">~80% of jobs</span></div>
+        <ul class="role-bullets"><li>Involved in capabilities presentations and creative positioning</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="panel-note">Most marketing materials that fuel this leg are created between Legs 1 and 4 — not pulled together at the last minute. The better Leg 4 performs, the stronger Leg 1 becomes.</div>
+</div>
+
+<!-- LEG 2 -->
+<div id="panel-leg2" class="panel">
+  <div class="panel-header">
+    <div>
+      <div class="panel-eyebrow" style="color:#185FA5">Leg 2 · Baton Pass #1</div>
+      <div class="panel-title">Project Intake / Scoping</div>
+      <div class="panel-sub">Briefs · Bidding · Pitching / treatments · Job planning · Resourcing</div>
+    </div>
+    <span class="close-btn" onclick="closeDetail('leg2')">Close ✕</span>
+  </div>
+  <div class="panel-body">
+    <div class="panel-col">
+      <div class="col-label">How this leg works</div>
+      <p class="narrative">This stage is when there is an active opportunity to bid or pitch a project. A job name and number is made, the incoming opportunity email has been sent and we are ready to move forward.</p>
+      <p class="narrative">A project can live and end here with a pitch submission. However, if the project is moving forward with bidding, the budget set on this leg is the budget lived with for the rest of the race. If it's wrong here, it's wrong everywhere. This is the most consequential moment for financial health.</p>
+      <p class="narrative">Depending on the stage of the project, there is a variety of involvement from the key teammates.</p>
+      <div class="col-label" style="margin-top:16px">The BD EP's role</div>
+      <ul class="role-bullets">
+        <li>Leads or supports the bid: scoping, pricing, and presenting to the client</li>
+        <li>Ensures the budget is properly set before handoff — if it's wrong at award, it's wrong forever</li>
+        <li>Transitions the client relationship cleanly to the Production EP at award</li>
+        <li>Stays available as a senior resource if the relationship needs attention later in the race</li>
+      </ul>
+      <div class="col-label" style="margin-top:16px">The Production EP's role</div>
+      <ul class="role-bullets">
+        <li>Takes full ownership of the client relationship at award</li>
+        <li>Leads or oversees the scoping, brief, and treatment process</li>
+        <li>Validates that the budget is properly set before the project moves forward</li>
+        <li>Aligns with ECD on creative approach and feasibility</li>
+        <li>Sets the client up for a smooth handoff into Leg 3</li>
+      </ul>
+      <div class="col-label" style="margin-top:16px">The HOP's role</div>
+      <ul class="role-bullets">
+        <li>Receives the internal handoff and immediately owns execution: system setup, team assignment, resourcing</li>
+        <li>Initializes the project in Timmy and all studio systems</li>
+        <li>Builds the resourcing plan and identifies freelance needs</li>
+        <li>Schedules internal kickoff and ensures all teams are aligned before production begins</li>
+        <li>Passes the baton to Producers + Creative once the project is fully set up and running</li>
+      </ul>
+    </div>
+    <div class="panel-col">
+      <div class="col-label">Team on this leg</div>
+      <div class="role-block">
+        <div class="role-name">BD EP <span class="tag tag-neutral">Handoff</span></div>
+        <ul class="role-bullets"><li>Transitions the client and context to the Production EP — then steps back</li></ul>
+      </div>
+      <div class="role-block">
+        <div class="role-name">Production EP <span class="tag tag-core">Core</span></div>
+        <ul class="role-bullets"><li>Takes client ownership, leads scoping and bid, sets the creative direction</li></ul>
+      </div>
+      <div class="role-block">
+        <div class="role-name">ECD <span class="tag tag-sit">~90% of jobs</span></div>
+        <ul class="role-bullets"><li>Involved in creative approach, treatment development, and pitch</li></ul>
+      </div>
+      <div class="role-block">
+        <div class="role-name">HOP <span class="tag tag-neutral">Overlap moment</span></div>
+        <ul class="role-bullets"><li>Flags resourcing capacity for pipeline planning; owns all internal setup, resourcing, job planning, and financial initialization</li></ul>
+      </div>
+      <div class="role-block">
+        <div class="role-name">Producer <span class="tag tag-sit">Situational</span></div>
+        <ul class="role-bullets"><li>Brought in on certain project types during intake and planning; contributes to internal setup and resourcing if necessary</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="panel-note">This is the most consequential handoff on the track. A clean, documented baton pass — not a drift — sets the tone for everything that follows. Budget wrong here means budget wrong everywhere.</div>
+</div>
+
+<!-- LEG 3 -->
+<div id="panel-leg3" class="panel">
+  <div class="panel-header">
+    <div>
+      <div class="panel-eyebrow" style="color:#3B6D11">Leg 3 · Baton Pass #2</div>
+      <div class="panel-title">Production</div>
+      <div class="panel-sub">Live &amp; post production · Pre through delivery · All creative disciplines</div>
+    </div>
+    <span class="close-btn" onclick="closeDetail('leg3')">Close ✕</span>
+  </div>
+  <div class="panel-body">
+    <div class="panel-col">
+      <div class="col-label">How this leg works</div>
+      <p class="narrative">BD hands off the baton at award. The BD EP shifts from hunter to steward — their active leg is done. The Production EP takes full ownership of the client from this moment through delivery, and the HOP takes the operational baton entirely.</p>
+      <p class="narrative">The Production EP and HOP now run this leg together, but with a clean split: the EP is client-facing, the HOP is studio-facing. The EP owns the relationship and creative trust. The HOP owns the internal engine — resourcing, job planning, system setup, and financial tracking.</p>
+      <p class="narrative">This is the longest leg of the race — from project kickoff through final delivery. The Producer takes the baton for day-to-day client communication and project management, operating under the guidance of the EP and HOP when needed.</p>
+      <p class="narrative">The HOP runs the studio-side engine throughout: overseeing budgets in Timmy from producers, managing producer workloads, identifying resourcing gaps, and making sure every internal system is functioning. BD EP is minimal here — available in the background if a senior relationship moment arises.</p>
+      <div class="col-label" style="margin-top:16px">The Production EP's role</div>
+      <ul class="role-bullets">
+        <li>Remains the client's primary senior relationship and face of trust</li>
+        <li>Steps in for escalations, overages, and scope changes needing senior authority</li>
+        <li>Monitors delivery quality and client sentiment week to week</li>
+        <li>Is already thinking about the next job — looping back toward BD</li>
+      </ul>
+      <div class="col-label" style="margin-top:16px">The HOP's role</div>
+      <ul class="role-bullets">
+        <li>Manages producers day to day — guidance, problem-solving, and accountability</li>
+        <li>Runs the internal financial engine: Timmy, timesheets, budget tracking</li>
+        <li>Identifies when jobs are going off the rails and course-corrects early</li>
+        <li>Ensures quality, communication standards, and Versus process are upheld</li>
+      </ul>
+      <div class="col-label" style="margin-top:16px">The Producer's role</div>
+      <ul class="role-bullets">
+        <li>Owns day-to-day client communication and project management</li>
+        <li>Runs the project on the ground: schedules, reviews, feedback loops, and delivery</li>
+        <li>Escalates to EP or HOP when a situation needs senior handling</li>
+      </ul>
+    </div>
+    <div class="panel-col">
+      <div class="col-label">Team on this leg</div>
+      <div class="role-block">
+        <div class="role-name">Production EP <span class="tag tag-core">Core</span></div>
+        <ul class="role-bullets"><li>Senior client relationship, escalation point, delivery oversight</li></ul>
+      </div>
+      <div class="role-block">
+        <div class="role-name">ECD <span class="tag tag-sit">~90% of jobs</span></div>
+        <ul class="role-bullets"><li>Creative direction, internal reviews, quality standard</li></ul>
+      </div>
+      <div class="role-block">
+        <div class="role-name">HOP <span class="tag tag-core">Core</span></div>
+        <ul class="role-bullets"><li>Studio-side operational engine, producer management, financial tracking</li></ul>
+      </div>
+      <div class="role-block">
+        <div class="role-name">Resource Manager / Coordinator <span class="tag tag-neutral">Role in development</span></div>
+        <ul class="role-bullets"><li>Will support resourcing plans and freelance tracking as role is built out</li></ul>
+      </div>
+      <div class="role-block">
+        <div class="role-name">Producer <span class="tag tag-core">Core</span></div>
+        <ul class="role-bullets"><li>Day-to-day client comms, project management, execution</li></ul>
+      </div>
+      <div class="role-block">
+        <div class="role-name">Artists <span class="tag tag-core">Core</span></div>
+        <ul class="role-bullets"><li>Motion, VFX, Design, Edit — the work itself</li></ul>
+      </div>
+      <div class="role-block">
+        <div class="role-name">BD EP <span class="tag tag-minimal">Minimal</span></div>
+        <ul class="role-bullets"><li>Oversight as needed — available if client relationship needs senior attention</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="panel-note">When this leg works well, clients never see the seam between the Producer, the EP, and the HOP. Each person knows their lane. Escalations are fast, decisions are clean, and delivery is never a surprise.</div>
+</div>
+
+<!-- LEG 4 -->
+<div id="panel-leg4" class="panel">
+  <div class="panel-header">
+    <div>
+      <div class="panel-eyebrow" style="color:#534AB7">Leg 4 · Baton Pass #3</div>
+      <div class="panel-title">Marketing &amp; PR</div>
+      <div class="panel-sub">Case studies · Website updates · Marketing &amp; PR moments · Awards</div>
+    </div>
+    <span class="close-btn" onclick="closeDetail('leg4')">Close ✕</span>
+  </div>
+  <div class="panel-body">
+    <div class="panel-col">
+      <div class="col-label">How this leg works</div>
+      <p class="narrative">The final leg doesn't end at delivery — it completes the loop. Once a project ships, the work isn't over: it needs to be documented, positioned, and activated so Versus gets full value from what it built. Great work that nobody sees outside the studio is a missed opportunity.</p>
+      <p class="narrative">Most marketing materials are created between Legs 1 and 4 — not assembled as an afterthought. For the roughly 20% of projects that need bespoke materials, the HOP identifies and resources the right team. But the goal is always to have assets ready before delivery, not chasing them after.</p>
+      <p class="narrative">This leg feeds directly back to BD at the start line. Every case study is a future pitch, every award is a door opener, every social post is a conversation starter. The better this leg runs, the stronger Leg 1 becomes.</p>
+      <div class="col-label" style="margin-top:16px">The BD EP's role</div>
+      <ul class="role-bullets">
+        <li>Leads the conversation with the client about what can be shared publicly</li>
+        <li>Gets sign-off on footage, credits, and any PR or social use</li>
+        <li>Identifies whether this project opens the door to a follow-up opportunity</li>
+      </ul>
+      <div class="col-label" style="margin-top:16px">The ECD's role</div>
+      <ul class="role-bullets">
+        <li>Ensures the work is framed in a way that advances the Versus creative brand</li>
+        <li>Drives award submissions and positions work for industry recognition</li>
+        <li>Signs off on how the studio's craft is represented externally</li>
+      </ul>
+    </div>
+    <div class="panel-col">
+      <div class="col-label">Team on this leg</div>
+      <div class="role-block">
+        <div class="role-name">BD EP <span class="tag tag-core">Core</span></div>
+        <ul class="role-bullets"><li>Client approval, PR sign-off, follow-up opportunity identification</li></ul>
+      </div>
+      <div class="role-block">
+        <div class="role-name">ECD <span class="tag tag-core">Core</span></div>
+        <ul class="role-bullets"><li>Creative brand framing, award submissions, external representation</li></ul>
+      </div>
+      <div class="role-block">
+        <div class="role-name">Production EP <span class="tag tag-minimal">Minimal</span></div>
+        <ul class="role-bullets"><li>Oversight as needed — available for high-value PR or relationship moments</li></ul>
+      </div>
+      <div class="role-block">
+        <div class="role-name">HOP <span class="tag tag-sit">~20% of projects</span></div>
+        <ul class="role-bullets"><li>Identifies and resources the team when bespoke marketing assets are needed</li></ul>
+      </div>
+      <div class="role-block">
+        <div class="role-name">Producer / Artists <span class="tag tag-sit">~20% of projects</span></div>
+        <ul class="role-bullets"><li>Create bespoke marketing assets when needed — ideally scoped and completed during Leg 3</li></ul>
+      </div>
+    </div>
+  </div>
+  <div class="panel-note">The goal is for marketing asset creation to happen during Leg 3 — not after delivery. When Leg 4 has everything it needs before the finish line, the loop back to BD is faster, cleaner, and more effective.</div>
+</div>
+
+</div><!-- end .page -->
+
+<script>
+function resetAll() {
+  document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+  activeLeg = null;
+  drawRing();
+}
+function showDetail(id) {
+  var active = document.querySelector('.panel.active');
+  if (active && active.id === 'panel-' + id) { closeDetail(id); return; }
+  document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+  document.getElementById('panel-' + id).classList.add('active');
+  activeLeg = id;
+  drawRing();
+  document.getElementById('panel-' + id).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function closeDetail(id) {
+  document.getElementById('panel-' + id).classList.remove('active');
+  activeLeg = null;
+  drawRing();
+}
+
+
+// Draw ring with 4 solid legs, short blend only at seams
+var activeLeg = null;
+
+function drawRing() {
+  var canvas = document.getElementById('ringCanvas');
+  var wrap = canvas.parentElement;
+  var size = wrap.offsetWidth;
+  var h = size * 560 / 680;
+  canvas.width = size * window.devicePixelRatio;
+  canvas.height = h * window.devicePixelRatio;
+  canvas.style.width = size + 'px';
+  canvas.style.height = h + 'px';
+
+  var ctx = canvas.getContext('2d');
+  ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+
+  var scale = size / 680;
+  var cx = 340 * scale;
+  var cy = 295 * scale;
+  var outerR = 285 * scale;
+  var innerR = 193 * scale;
+  var ringW = outerR - innerR;
+  var midR = (outerR + innerR) / 2;
+
+  // 4 legs, each 90deg (0.25 of circle), CCW from top
+  // Blend zone = 4% of circle at each seam (~14deg) — only the last 2% of one leg and first 2% of next
+  var legs = [
+    { color: '#F0B9A0' }, // Leg 1 — coral (slightly deeper for canvas rendering)
+    { color: '#A8CAEE' }, // Leg 2 — blue
+    { color: '#AECE87' }, // Leg 3 — green
+    { color: '#C4C0F0' }, // Leg 4 — purple
+  ];
+
+  var totalSegs = 720; // high resolution for smoothness
+  var blendFraction = 0.20; // 20% of full circle = blend zone at each seam
+
+  for (var i = 0; i < totalSegs; i++) {
+    var t = i / totalSegs; // position around circle 0..1
+    var tNext = (i + 1) / totalSegs;
+
+    var a1 = -Math.PI/2 - (t * Math.PI * 2);
+    var a2 = -Math.PI/2 - (tNext * Math.PI * 2);
+
+    // Which leg are we in? 0..3
+    var legIdx = Math.floor(t * 4) % 4;
+    var legT = (t * 4) % 1; // 0..1 within this leg
+
+    var color;
+    var nextLegIdx = (legIdx + 1) % 4;
+
+    // Determine base color with blend
+    var blendStart = 1 - blendFraction;
+    var baseColor;
+    if (legT >= blendStart) {
+      var bt = (legT - blendStart) / blendFraction;
+      bt = bt * bt;
+      baseColor = lerpColor(legs[legIdx].color, legs[nextLegIdx].color, bt);
+    } else {
+      baseColor = legs[legIdx].color;
+    }
+
+    // Dim inactive legs when one is selected
+    if (activeLeg !== null) {
+      var legName = 'leg' + (legIdx + 1);
+      // also check blend zone — which leg does it belong to visually
+      var isActive = (legName === activeLeg);
+      // blend zone: last 10% belongs to next leg visually
+      if (!isActive && legT >= (1 - blendFraction * 0.5)) {
+        var nextName = 'leg' + (nextLegIdx + 1);
+        isActive = (nextName === activeLeg);
+      }
+      if (isActive) {
+        color = baseColor;
+      } else {
+        // Desaturate and lighten for inactive
+        color = dimColor(baseColor, 0.18);
+      }
+    } else {
+      color = baseColor;
+    }
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, midR, a1, a2, true);
+    ctx.lineWidth = ringW;
+    ctx.strokeStyle = color;
+    ctx.lineCap = 'butt';
+    ctx.stroke();
+  }
+}
+
+function lerpColor(a, b, t) {
+  var ar = parseInt(a.slice(1,3),16), ag = parseInt(a.slice(3,5),16), ab = parseInt(a.slice(5,7),16);
+  var br = parseInt(b.slice(1,3),16), bg = parseInt(b.slice(3,5),16), bb = parseInt(b.slice(5,7),16);
+  var r = Math.round(ar + (br-ar)*t);
+  var g = Math.round(ag + (bg-ag)*t);
+  var bv = Math.round(ab + (bb-ab)*t);
+  return 'rgb('+r+','+g+','+bv+')';
+}
+
+function dimColor(hex, opacity) {
+  // Mix color toward the background color #f0eeea at low opacity
+  var bg = {r:240, g:238, b:234};
+  var r, g, b;
+  if (hex.startsWith('rgb')) {
+    var parts = hex.match(/\d+/g);
+    r = parseInt(parts[0]); g = parseInt(parts[1]); b = parseInt(parts[2]);
+  } else {
+    r = parseInt(hex.slice(1,3),16);
+    g = parseInt(hex.slice(3,5),16);
+    b = parseInt(hex.slice(5,7),16);
+  }
+  // Mix heavily toward bg
+  var mix = 0.82;
+  r = Math.round(r * (1-mix) + bg.r * mix);
+  g = Math.round(g * (1-mix) + bg.g * mix);
+  b = Math.round(b * (1-mix) + bg.b * mix);
+  return 'rgb('+r+','+g+','+b+')';
+}
+
+window.addEventListener('load', drawRing);
+window.addEventListener('resize', drawRing);
+</script>
+</body>
+</html>
