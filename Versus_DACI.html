@@ -8,54 +8,40 @@
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; background: #f5f4f0; color: #111827; min-height: 100vh; }
   .page { max-width: 860px; margin: 0 auto; padding: 32px 20px 60px; }
-
   .page-title { font-size: 28px; font-weight: 700; color: #111827; margin-bottom: 4px; }
   .page-sub { font-size: 13px; color: #6b7280; margin-bottom: 24px; padding-bottom: 20px; border-bottom: 1px solid #e5e7eb; }
-
   .legend { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 28px; }
   .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #6b7280; }
-  .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; }
-  .badge-D { background: #FCE7F3; color: #9D174D; }
-  .badge-A { background: #DBEAFE; color: #1E40AF; }
-  .badge-C { background: #D1FAE5; color: #065F46; }
-  .badge-I { background: #FEF3C7; color: #92400E; }
-
+  .badge { display: inline-block; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 20px; white-space: nowrap; }
+  .badge-D  { background: #FCE7F3; color: #9D174D; }
+  .badge-A  { background: #DBEAFE; color: #1E40AF; }
+  .badge-C  { background: #D1FAE5; color: #065F46; }
+  .badge-I  { background: #FEF3C7; color: #92400E; }
+  .badge-IA { background: #EDE9FE; color: #4C1D95; }
+  .badge-IC { background: #FEF9C3; color: #713F12; }
+  .badge-DA { background: #FDF2F8; color: #831843; }
+  .badge-DCAI { background: #F3F4F6; color: #374151; }
   .nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 24px; }
-  .nav-btn {
-    font-size: 12px; font-weight: 500; padding: 6px 14px;
-    border-radius: 8px; border: 1px solid #d1d5db;
-    background: #fff; color: #6b7280; cursor: pointer; transition: all 0.15s;
-  }
+  .nav-btn { font-size: 12px; font-weight: 500; padding: 6px 14px; border-radius: 8px; border: 1px solid #d1d5db; background: #fff; color: #6b7280; cursor: pointer; transition: all 0.15s; }
   .nav-btn:hover { background: #f3f4f6; color: #111827; }
   .nav-btn.active { background: #1D4ED8; border-color: #1D4ED8; color: #fff; }
-
   .panel { display: none; }
   .panel.active { display: block; }
-
   .panel-title { font-size: 18px; font-weight: 700; color: #111827; margin-bottom: 4px; }
   .panel-desc { font-size: 13px; color: #6b7280; line-height: 1.6; margin-bottom: 14px; }
-  .note-box {
-    background: #eff6ff; border-left: 3px solid #1D4ED8;
-    border-radius: 0 8px 8px 0; padding: 10px 14px;
-    font-size: 13px; color: #374151; line-height: 1.6;
-    margin-bottom: 16px; font-style: italic;
-  }
-
+  .note-box { background: #eff6ff; border-left: 3px solid #1D4ED8; border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 13px; color: #374151; line-height: 1.6; margin-bottom: 16px; font-style: italic; }
   table { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; background: #fff; border-radius: 10px; overflow: hidden; border: 1px solid #e5e7eb; }
   th { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #1D4ED8; background: #eff6ff; padding: 9px 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
-  th:nth-child(2) { width: 9%; text-align: center; }
+  th:nth-child(2) { width: 11%; text-align: center; }
   th:first-child { width: 22%; }
   td { padding: 11px 12px; border-bottom: 1px solid #f3f4f6; vertical-align: top; color: #111827; line-height: 1.55; }
   tr:last-child td { border-bottom: none; }
   tr:hover td { background: #f9fafb; }
   td:nth-child(2) { text-align: center; }
-
   .role-name { font-weight: 600; font-size: 13px; color: #111827; }
   .role-person { font-size: 11px; color: #9ca3af; margin-top: 2px; }
-
-  .ov-table th:first-child { width: 20%; }
   .ov-table th { font-size: 9px; text-align: center; }
-  .ov-table th:first-child { text-align: left; }
+  .ov-table th:first-child { text-align: left; width: 20%; }
   .ov-table td { text-align: center; font-size: 12px; }
   .ov-table td:first-child { text-align: left; }
   .ov-role { font-size: 10px; color: #9ca3af; }
@@ -65,35 +51,36 @@
 <div class="page">
   <div class="page-title">Versus — DACI Chart</div>
   <div class="page-sub">Who drives, who approves, who contributes, who is informed — across every key responsibility area.</div>
-
   <div class="legend">
-    <div class="legend-item"><span class="badge badge-D">D</span> Driver — steers the process, ensures decision happens</div>
-    <div class="legend-item"><span class="badge badge-A">A</span> Approver — single person with final authority</div>
-    <div class="legend-item"><span class="badge badge-C">C</span> Contributor — provides input, no vote</div>
-    <div class="legend-item"><span class="badge badge-I">I</span> Informed — kept up to date on outcomes</div>
+    <div class="legend-item"><span class="badge badge-D">D</span> Driver — steers the process</div>
+    <div class="legend-item"><span class="badge badge-A">A</span> Approver — final authority</div>
+    <div class="legend-item"><span class="badge badge-C">C</span> Contributor — input, no vote</div>
+    <div class="legend-item"><span class="badge badge-I">I</span> Informed — kept updated</div>
   </div>
-
   <div class="nav" id="nav"></div>
   <div id="panels"></div>
 </div>
 
 <script>
-const bc = { D:"badge-D", A:"badge-A", C:"badge-C", I:"badge-I" };
+const badgeMap = {
+  "D":"badge-D","A":"badge-A","C":"badge-C","I":"badge-I",
+  "I/A":"badge-IA","I/C":"badge-IC","D/C/A/I":"badge-DCAI"
+};
 
 const sections = [
   {
     id:"overview", label:"Overview", isOverview:true,
     title:"Full DACI map — all sections",
-    desc:"Scan across all eight responsibility areas at once. Click any section tab to see the working detail behind each assignment.",
+    desc:"Scan across all eight responsibility areas. Click any section tab for the working detail behind each assignment.",
     note:null,
     cols:["Production","Financial","Resourcing","Team","Project setup","Systems","Comms","Post-delivery"],
     rows:[
-      { role:"MD / DOCO",           person:"Kathryn Henderson",  badges:["A","A","A","A","C","D","A","A"] },
-      { role:"Head of Production",  person:"",                   badges:["D","D","D","D","D","C","D","D"] },
-      { role:"CEO",                 person:"Justin Barnes",      badges:["I","A","I","I","I","A","I","I"] },
-      { role:"President",           person:"Rob Meyers",         badges:["I","A","C","I","C","I","I","C"] },
-      { role:"Production EP Team",  person:"Kevin + open role",  badges:["C","C","C","I","D","I","C","C"] },
-      { role:"Finance / CFO",       person:"Samantha / Alex",    badges:["I","A","I","I","I","C","I","I"] },
+      { role:"MD / DOCO",          person:"Kathryn Henderson", badges:["A","A","C","A","C","D","A","A"] },
+      { role:"Head of Production", person:"",                  badges:["D","D","D","D","D","C","D","D"] },
+      { role:"CEO",                person:"Justin Barnes",     badges:["I","A","I/A","I","I","I","I","I"] },
+      { role:"President",          person:"Rob Meyers",        badges:["I","A","D/C/A/I","I","C","I","I","C"] },
+      { role:"Production EP Team", person:"Kevin + open role", badges:["C","C","C","I","D","I","C","C"] },
+      { role:"Finance / CFO",      person:"Samantha / Alex",   badges:["I","A","I/C","I","I","C","C","I"] },
     ]
   },
   {
@@ -128,14 +115,14 @@ const sections = [
     id:"s3", label:"3. Resourcing",
     title:"Resourcing & workforce management",
     desc:"Staffing strategy, freelance lifecycle, hiring forecasts, and coverage planning.",
-    note:"HOP drives staffing execution. Kathryn approves — she has the studio-wide view that HOP may not. Rob is a contributor when resourcing connects to pipeline and growth decisions.",
+    note:"HOP drives staffing execution and brings decisions to Justin for approval, looping in MD, President, and Finance as needed. Rob drives full-time hire decisions and has broad oversight across this area.",
     rows:[
-      ["MD / DOCO","Kathryn Henderson","A","Approves resourcing plans, full-time hire decisions, and significant freelance spend. Has the studio-wide view to evaluate trade-offs HOP may not see."],
-      ["Head of Production","","D","Drives all resourcing: plans, forecasts, freelance database, holds, bookings, and coverage. Brings decisions to Kathryn for approval."],
-      ["CEO","Justin Barnes","I","Informed of significant headcount or structural staffing changes."],
-      ["President","Rob Meyers","C","Contributor when resourcing decisions relate to pipeline capacity or growth opportunities."],
+      ["MD / DOCO","Kathryn Henderson","C","Consults on resourcing plans, full-time hire decisions, and significant freelance spend. Has the studio-wide view to evaluate trade-offs HOP may not see."],
+      ["Head of Production","","D","Drives all resourcing: plans, forecasts, freelance database, holds, bookings, and coverage. Brings decisions to Justin for approval. Loops in MD, President, and Finance as needed."],
+      ["CEO","Justin Barnes","I/A","Approves resourcing and job plans from HOP. Informed of significant headcount or structural staffing changes."],
+      ["President","Rob Meyers","D/C/A/I","Contributor when resourcing decisions relate to pipeline capacity or growth opportunities. Drives full-time hire decisions and significant freelance spend. Has studio-wide view to evaluate trade-offs."],
       ["Production EP Team","Kevin + open role","C","Contributors on project-specific staffing needs and crew preferences. Input sought during project setup."],
-      ["Finance / CFO","Samantha / Alex","I","Informed of freelance spend and headcount changes as they affect labor cost forecasts."],
+      ["Finance / CFO","Samantha / Alex","I/C","Informed of freelance spend and headcount changes as they affect labor cost forecasts."],
     ]
   },
   {
@@ -174,10 +161,10 @@ const sections = [
     rows:[
       ["MD / DOCO","Kathryn Henderson","D","Drives larger systems builds, workflow architecture, and tech initiatives that are too complex for HOP given their production workload. Takes HOP's flags and turns them into solutions."],
       ["Head of Production","","C","Day-to-day operator and contributor. Drives maintenance and monitoring of what exists — software licenses, AI tool costs, passwords, render farm health, artist software needs. Flags problems to DOCO."],
-      ["CEO","Justin Barnes","A","Approver on significant technology investments or infrastructure decisions with company-level cost or strategic impact."],
+      ["CEO","Justin Barnes","I","Informed of significant technology investments or infrastructure decisions with company-level cost or strategic impact."],
       ["President","Rob Meyers","I","Informed of systems changes that affect studio scalability or competitive positioning."],
       ["Production EP Team","Kevin + open role","I","Informed of workflow changes that affect how they interact with the production team."],
-      ["Finance / CFO","Samantha / Alex","C","Contributor on systems that affect financial tracking, Timmy integrations, or cost reporting."],
+      ["Finance / CFO","Samantha / Alex","C","Contributor on systems that affect financial tracking, Timmy integrations, or cost reporting. Informed of workflow changes that affect how they interact with other teams."],
     ]
   },
   {
@@ -239,7 +226,8 @@ sections.forEach(function(s, i) {
     s.rows.forEach(function(row){
       html += '<tr><td><div class="role-name">'+row.role+'</div><div class="ov-role">'+row.person+'</div></td>';
       row.badges.forEach(function(b){
-        html += '<td><span class="badge '+bc[b]+'">'+b+'</span></td>';
+        var cls = badgeMap[b] || 'badge-I';
+        html += '<td><span class="badge '+cls+'">'+b+'</span></td>';
       });
       html += '</tr>';
     });
@@ -247,8 +235,9 @@ sections.forEach(function(s, i) {
   } else {
     html += '<table><thead><tr><th>Role</th><th>DACI</th><th>What this means in practice</th></tr></thead><tbody>';
     s.rows.forEach(function(row){
-      html += '<tr><td><div class="role-name">'+row[0]+'</div><div class="role-person" style="font-size:11px;color:#9ca3af;margin-top:2px">'+row[1]+'</div></td>';
-      html += '<td><span class="badge '+bc[row[2]]+'">'+row[2]+'</span></td>';
+      var cls = badgeMap[row[2]] || 'badge-I';
+      html += '<tr><td><div class="role-name">'+row[0]+'</div><div class="role-person">'+row[1]+'</div></td>';
+      html += '<td><span class="badge '+cls+'">'+row[2]+'</span></td>';
       html += '<td>'+row[3]+'</td></tr>';
     });
     html += '</tbody></table>';
