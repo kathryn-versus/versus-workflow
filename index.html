@@ -62,7 +62,7 @@
 
 <div class="track-wrap" style="position:relative;">
 <canvas id="ringCanvas" style="width:100%;height:auto;display:block;"></canvas>
-<svg id="trackSvg" viewBox="0 0 680 560" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:0;left:0;width:100%;height:100%;">
+<svg id="trackSvg" viewBox="0 0 680 620" xmlns="http://www.w3.org/2000/svg" style="position:absolute;top:0;left:0;width:100%;height:100%;">
   <defs>
     <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
       <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -133,18 +133,18 @@
     <text x="102" y="52" text-anchor="middle" font-size="9" fill="#993C1D" font-family="-apple-system,sans-serif">Outreach · Lead Gen · Capabilities · P/R</text>
   </g>
   <g class="tap" onclick="showDetail('leg2')">
-    <rect x="4" y="494" width="196" height="58" rx="9" fill="#E6F1FB" stroke="#85B7EB" stroke-width="1.5"/>
-    <text x="102" y="510" text-anchor="middle" font-size="8" font-weight="600" fill="#185FA5" letter-spacing="1.4" font-family="-apple-system,sans-serif">BATON PASS #1</text>
-    <text x="102" y="525" text-anchor="middle" font-size="12" font-weight="600" fill="#0C447C" font-family="-apple-system,sans-serif">Project Intake / Scoping</text>
-    <text x="102" y="538" text-anchor="middle" font-size="9" fill="#185FA5" font-family="-apple-system,sans-serif">Briefs · Bidding · Pitching</text>
-    <text x="102" y="550" text-anchor="middle" font-size="9" fill="#185FA5" font-family="-apple-system,sans-serif">Job Planning · Resourcing</text>
+    <rect x="4" y="554" width="196" height="58" rx="9" fill="#E6F1FB" stroke="#85B7EB" stroke-width="1.5"/>
+    <text x="102" y="570" text-anchor="middle" font-size="8" font-weight="600" fill="#185FA5" letter-spacing="1.4" font-family="-apple-system,sans-serif">BATON PASS #1</text>
+    <text x="102" y="585" text-anchor="middle" font-size="12" font-weight="600" fill="#0C447C" font-family="-apple-system,sans-serif">Project Intake / Scoping</text>
+    <text x="102" y="598" text-anchor="middle" font-size="9" fill="#185FA5" font-family="-apple-system,sans-serif">Briefs · Bidding · Pitching</text>
+    <text x="102" y="610" text-anchor="middle" font-size="9" fill="#185FA5" font-family="-apple-system,sans-serif">Job Planning · Resourcing</text>
   </g>
   <g class="tap" onclick="showDetail('leg3')">
-    <rect x="480" y="494" width="196" height="58" rx="9" fill="#EAF3DE" stroke="#97C459" stroke-width="1.5"/>
-    <text x="578" y="510" text-anchor="middle" font-size="8" font-weight="600" fill="#3B6D11" letter-spacing="1.4" font-family="-apple-system,sans-serif">BATON PASS #2</text>
-    <text x="578" y="525" text-anchor="middle" font-size="12" font-weight="600" fill="#27500A" font-family="-apple-system,sans-serif">Production</text>
-    <text x="578" y="538" text-anchor="middle" font-size="9" fill="#3B6D11" font-family="-apple-system,sans-serif">Live &amp; Post · Pre through Delivery</text>
-    <text x="578" y="550" text-anchor="middle" font-size="9" fill="#3B6D11" font-family="-apple-system,sans-serif">Artists · Motion · VFX · Editors</text>
+    <rect x="480" y="554" width="196" height="58" rx="9" fill="#EAF3DE" stroke="#97C459" stroke-width="1.5"/>
+    <text x="578" y="570" text-anchor="middle" font-size="8" font-weight="600" fill="#3B6D11" letter-spacing="1.4" font-family="-apple-system,sans-serif">BATON PASS #2</text>
+    <text x="578" y="585" text-anchor="middle" font-size="12" font-weight="600" fill="#27500A" font-family="-apple-system,sans-serif">Production</text>
+    <text x="578" y="598" text-anchor="middle" font-size="9" fill="#3B6D11" font-family="-apple-system,sans-serif">Live &amp; Post · Pre through Delivery</text>
+    <text x="578" y="610" text-anchor="middle" font-size="9" fill="#3B6D11" font-family="-apple-system,sans-serif">Artists · Motion · VFX · Editors</text>
   </g>
   <g class="tap" onclick="showDetail('leg4')">
     <rect x="480" y="8" width="196" height="52" rx="9" fill="#EEEDFE" stroke="#AFA9EC" stroke-width="1.5"/>
@@ -186,8 +186,8 @@
         <ul class="role-bullets"><li>Drives all outreach, lead generation, and pipeline development</li></ul>
       </div>
       <div class="role-block">
-        <div class="role-name">BD EPs <span class="tag tag-core">Opportunity Dependent</span></div>
-        <ul class="role-bullets"><li>Potentially involved in capabilities presentations or other business development opportunities prior to Leg 2 </li></ul>
+        <div class="role-name">BD EPs <span class="tag tag-core">Core</span></div>
+        <ul class="role-bullets"><li>Lead the bid and client relationship through to award</li></ul>
       </div>
       <div class="role-block">
         <div class="role-name">ECD <span class="tag tag-sit">~80% of jobs</span></div>
@@ -425,7 +425,7 @@ function drawRing() {
   var canvas = document.getElementById('ringCanvas');
   var wrap = canvas.parentElement;
   var size = wrap.offsetWidth;
-  var h = size * 560 / 680;
+  var h = size * 620 / 680;
   canvas.width = size * window.devicePixelRatio;
   canvas.height = h * window.devicePixelRatio;
   canvas.style.width = size + 'px';
